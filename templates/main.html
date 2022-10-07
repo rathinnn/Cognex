@@ -1,0 +1,131 @@
+{% extends 'home.html' %}
+{% block masthead %}
+{% if task_requests %}
+<header class="masthead2">
+    <div class="container px-4 px-lg-5 d-flex align-items-center justify-content-center">
+        <div class="d-flex justify-content-center">
+            <div class="text-center">
+                <h1 class="mx-auto my-0 text-uppercase">You have Pending work requests</h1>
+                <hr>
+                {% for request in task_requests %}
+                <div class="alert alert-info" role="alert">
+                    Task Request from {{request.project.manager.username}}<br>
+                    Project Title:- {{request.project.title}}<br>
+                    Task Title:- {{request.task.title}}<br>
+                    weight: {{request.task.weight}}<br>
+                    <a class="btn btn-primary" href="{% url 'accept' request.id%}">Accept</a> 
+                    <a class="btn btn-primary" href="{% url 'reject' request.id%}">Reject</a> 
+                    <hr>
+                </div>
+                {% endfor %}
+                <a class="btn btn-primary" href="#projects">Go To Projects</a>             
+            </div>
+        </div>
+        
+    </div>
+
+</header>
+{% endif %}
+
+<header class="masthead", id = "projects">
+    <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
+        <div class="d-flex justify-content-center">
+            <div class="text-center">
+                <h1 class="mx-auto my-0 text-uppercase">Projects</h1>
+                <h3 class="text-white-50 mx-auto mt-2 mb-5">See all your owned and assigned projects here</h3>
+                
+                    <a class="btn btn-primary" href="#openproject">Get Started</a> 
+                    <a class="btn btn-primary" href="{% url 'createProject' %}">Create Project</a>              
+            </div>
+        </div>
+        
+    </div>
+
+</header>
+{% endblock %}
+
+{% block main %}
+{% for message in messages %}
+<div class="alert alert-dismissible alert-success">
+  <button type="button" class="close" data-dismiss="alert">
+  ×
+  </button>
+  <strong>{{message}}</strong>
+</div>
+{% endfor %}
+<div class="container-fluid", id = "openproject">
+
+    <div class="text-center">
+
+            <h2 class="btn btn-primary">Pending Owned Projects</h2>
+            <div class="row justify-content-center text-uppercase">
+                {% if ownExists %}
+                {% for project in own_projects%}
+                {% if not project.completed %}
+                <div class="col-sm-2 d-flex align-items-stretch">
+                    <div class="card" style="color:black">
+                        <div class="card-body">
+                            <h5 class="card-title">{{project.title}}</h5>
+                            <br>
+                            <h6 class="card-subtitle mb-2 text-muted">Manager:- {{project.manager.username}}</h6>
+                            <p class="card-text">{{project.description|slice:"0:20"}}</p>
+                            <p class="card-text">Start Date: {{project.startDate}}</p>
+                            <p class="card-text">Expected Finish Date: {{project.expectedDate}}</p>
+                            <p><a class="btn btn-primary" href="{% url 'projectview' project.id%}">View/Edit Project</a></p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                No Owned Projects Pending
+                {% endif %}
+                
+
+            </div>
+
+            <br>
+            <h2 class="btn btn-primary">All Pending Projects</h2>
+            <div class="row justify-content-center text-uppercase">
+                {% if totalExists %}
+                {% for project in projects%}
+                {% if not project.completed %}
+                <div class="col-sm-2 d-flex align-items-stretch">
+                    <div class="card" style="color:black">
+                        <div class="card-body">
+                            <h5 class="card-title">{{project.title}}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">Manager:- {{project.manager.username}}</h6>
+                            <p class="card-text">{{project.description|slice:"0:20"}}</p>
+                            <p class="card-text">Start Date: {{project.startDate}}</p>
+                            <p class="card-text">Expected Finish Date: {{project.expectedDate}}</p>
+                            <p><a class="btn btn-primary" href="{% url 'projectview' project.id%}">View/Edit Project</a></p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                No Projects Pending
+                {% endif %}
+
+            </div>
+
+            <br>
+
+            {% block content %}
+            {% endblock %}
+    </div>
+
+</div>
+{% endblock %}
+
+
+{% block login %}
+<li class="nav-item">
+    <p class="nav-link">{{ user.username }}</p>
+</li>
+<li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

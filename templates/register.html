@@ -1,0 +1,57 @@
+{% extends "home.html" %}
+{% block masthead %}
+{% endblock %}
+
+{% block main %}
+{% for message in messages %}
+<div class="alert alert-dismissible alert-success">
+    <button type="button" class="close" data-dismiss="alert">
+        ×
+    </button>
+    <strong>{{message}}</strong>
+</div>
+{% endfor %}
+<div>
+    <form action="" method="POST">
+        <div class="container">
+            <div class="form-group row justify-content-center">
+                {% csrf_token %}
+
+                {% for field in form %}
+                <div class="form-group">
+                    <label class="col-form-label font-weight-normal">
+                        {{ field.label }}
+                        {% for error in field.errors %}
+                        <strong class="text-danger font-weight-normal" style="padding-left: 5px">*{{ error|escape }}</strong>
+                        {% endfor %}
+                    </label>
+                    <div>
+                        <input name="{{ field.name }}" class="form-control" type="text"
+                            value="{{ field.value|default_if_none:'' }}"
+                            placeholder="{{field.field.widget.attrs.placeholder}}">
+                    </div>
+                </div>
+                <br>
+                {% endfor %}
+                <label class="col-form-label font-weight-normal">Select Skills:</label>
+                {% for choice in choices %}
+                <div class="form-group">
+                    <input name = skills type="checkbox" value={{choice.1}}>
+                    <label class="col-form-label font-weight-normal">
+                        {{choice.1}}
+                    </label>
+                </div>
+                {% endfor %}
+                <hr>
+                <button type="submit" , class="btn btn-primary">Register</button>
+                <p>Already have an account? <a href="{% url 'login' %}">Signin here</a></p>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block pic2 %}
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "home.html" %}
+{% block masthead %}
+{% endblock %}
+
+{% block main %}
+{% for message in messages %}
+<div class="alert alert-dismissible alert-success">
+  <button type="button" class="close" data-dismiss="alert">
+  ×
+  </button>
+  <strong>{{message}}</strong>
+</div>
+{% endfor %}
+
+
+<form action="" method="POST">
+    <div class="container">
+        <div class = "form-group row justify-content-center">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+            <label class="col-form-label font-weight-normal">
+                {{ field.label  }}
+                {% for error in field.errors %}
+                    <strong class="text-danger font-weight-normal" style="padding-left: 5px">*{{ error|escape }}</strong>
+                {% endfor %}
+            </label>
+            <div>
+                {{field}}
+            </div>
+        </div>
+        <br>
+       {% endfor %}
+       <hr>
+       <button type="submit", class = "btn btn-primary" href = "{% url 'createTask' pk=project.id %}">Create Task</button>
+       </div>
+        
+    </div>  
+</form>
+</div>
+
+{% endblock %}
+
+{% block pic2 %}
+{% endblock %}

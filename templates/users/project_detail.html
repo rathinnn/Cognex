@@ -1,0 +1,125 @@
+{% extends 'home.html' %}
+{% block masthead %}
+<header class="masthead">
+    <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
+
+        <div class="d-flex justify-content-center">
+            <div class="text-center">
+                <h1 class="mx-auto my-0 text-uppercase">{{object.title}}</h1>
+                <h3 class="text-white-50 mx-auto mt-2 mb-5">{{object.description}}</h3>
+                <h3 class="text-white-50 mx-auto mt-2 mb-5 text-uppercase">Manager: {{object.manager.username}}</h3>
+                <h3 class="text-white-50 mx-auto mt-2 mb-5">View All available tasks and statistics here</h3>
+
+                <a class="btn btn-primary" href="#openproject">Get Started</a>
+                {% if user.id == object.manager.id %}
+                <a class="btn btn-primary" href="{% url 'projectcompleted' pk=object.id %}">Conclude Project</a>
+                <a class="btn btn-primary" href="{% url 'createTask' pk=object.id %}">Create Task</a>
+                {% endif %}
+                <hr>
+                <a class="btn btn-primary" href="{% url 'main' %}">Back to Projects</a>
+            </div>
+        </div>
+
+    </div>
+
+</header>
+{% endblock %}
+
+{% block main %}
+{% for message in messages %}
+<div class="alert alert-dismissible alert-success">
+    <button type="button" class="close" data-dismiss="alert">
+        ×
+    </button>
+    <strong>{{message}}</strong>
+</div>
+{% endfor %}
+<div class="container-fluid" , id="openproject">
+
+    <div class="text-center">
+
+        <h2 class="btn btn-primary">Assigned Tasks</h2>
+        <div class="row justify-content-center text-uppercase">
+            {% if ownExists %}
+            {% for task in usertasks%}
+            {% if not task.completed or not task.active %}
+            <div class="col-sm-2 d-flex align-items-stretch">
+                <div class="card" style="color:black">
+                    <div class="card-body">
+                        <h5 class="card-title">{{task.title}}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Type:- {{task.get_Type_display}}</h6>
+                        <p class="card-text">{{task.description}}</p>
+                        <p class="card-text">Start Date: {{task.startDate}}</p>
+                        <p class="card-text">Expected Finish Date: {{task.expectedDate}}</p>
+                        <p><a class="btn btn-primary" href="{% url 'taskcompleted' p_id=object.id pk=task.id%}">Mark
+                                Completed</a></p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% else %}
+            No Assigned Tasks Currently
+            {% endif %}
+
+
+        </div>
+
+        <br>
+        {% if user.id == object.manager.id %}
+        <h2 class="btn btn-primary">All Tasks</h2>
+        <div class="row justify-content-center text-uppercase">
+            {% if totalExists %}
+            {% for task in tasks%}
+            {% if not task.completed and task.active %}
+            <div class="col-sm-2 d-flex align-items-stretch">
+                <div class="card" style="color:black">
+                    <div class="card-body">
+                        <h5 class="card-title">{{task.title}}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Type:- {{task.get_Type_display}}</h6>
+                        <p class="card-text">{{task.description}}</p>
+                        <p class="card-text">Start Date: {{task.startDate}}</p>
+                        <p class="card-text">Expected Finish Date: {{task.expectedDate}}</p>
+                        <p class="card-text">Assigned To: {{task.Assigned.username}}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% else %}
+            No Tasks Currently
+            {% endif %}
+        </div>
+
+        <br>
+
+        {% endif %}
+    </div>
+
+</div>
+<div class="text-center">
+    <h1 class="mx-auto my-0 text-uppercase">Graphs and Statistics</h1>
+</div>
+{% if graphs %}
+<div class="container">
+    {% for graph in graphs %}
+    {{ graph|safe }}
+    <br>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+
+
+
+
+{% block login %}
+<li class="nav-item">
+    <p class="nav-link">{{ user.username }}</p>
+</li>
+<li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
