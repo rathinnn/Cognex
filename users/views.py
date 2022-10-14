@@ -10,15 +10,20 @@ from django.http import HttpResponse
 import plotly.graph_objects as go
 import plotly.express as px
 import datetime
+from .channel import recommend_client, put_client
+from .recommendations_pb2 import *
+from .recommendations_pb2_grpc import *
 def index(request) :
 	return render(request,'home.html')
 
 def register(request):
-	skills = request.POST['skills']
+	
 	if request.method == 'POST':
 		form = UserRegistrationForm(request.POST)
 		if form.is_valid():
-			form.save()
+			user = form.save()
+			requestx = PutRequest(id = user.id, skills = request.POST.getlist('skills'))
+			put_client.Put(requestx)
 			#requests.post('localhost')
 			messages.success(request, f'Your account has been created. You can log in now!')    
 			return redirect('login')
@@ -197,6 +202,19 @@ def createTask(request, pk):
 	except Project.DoesNotExist:
 		return HttpResponse('Error', status = 404)
 	if(request.user.is_authenticated and request.user.id == project.manager.id):
+		if request.method == "POST" and 'skill' in request.POST:
+			skill = request.POST.getlist('skill')[0]
+			requestx = FindRequest(skill = skill, max_results = 10)
+			response = recommend_client.Recommend(requestx)
+			recommended_users = []
+			for user in response.recommendations:
+				user = User.objects.get(id=user.id)
+				recommended_users.append(user.username)
+			if recommended_users:
+				notrecommended = False
+			else:
+				notrecommended = True
+			return render(request=request, template_name="createTask.html", context={'form':TaskForm(), 'project' : project, 'choices':Skill.choices,'notrecommended':notrecommended, 'recommendations':recommended_users})
 		if request.method == "POST":
 			
 			task_form = TaskForm(request.POST)
@@ -207,7 +225,7 @@ def createTask(request, pk):
 					assigned = User.objects.get(username = task_form.cleaned_data.get('Assigned'))
 				except User.DoesNotExist:
 					messages.error(request, 'Error user does not exist')
-					return render(request=request, template_name="createTask.html", context={'form':task_form, 'project' : project})
+					return render(request=request, template_name="createTask.html", context={'form':task_form, 'project' : project, 'choices':Skill.choices})
 
 				obj.project = project
 				obj.Assigned = assigned
@@ -226,14 +244,26 @@ def createTask(request, pk):
 				messages.success(request, ('Your Task was succesfully created'))
 			else:
 				messages.error(request, 'Error saving form')
-				return render(request=request, template_name="createTask.html", context={'form':task_form, 'project' : project})
+				return render(request=request, template_name="createTask.html", context={'form':task_form, 'project' : project, 'choices':Skill.choices})
 			
 			
 			return redirect("projectview", pk = project.id)
 		task_form = TaskForm()
-		return render(request=request, template_name="createTask.html", context={'form':task_form, 'project' : project})
+		return render(request=request, template_name="createTask.html", context={'form':task_form, 'project' : project, 'choices':Skill.choices})
 	else:
 		return HttpResponse('Unauthorized', status = 401)
+
+def getrecommendations(request, pk):
+	if request.method == 'POST':
+		skill = request.POST.getlist('skill')[0]
+		requestx = FindRequest(skill = skill, max_results = 10)
+		response = recommend_client.Recommend(requestx)
+		recommended_users = []
+		for user in response.recommendations:
+			user = User.objects.get(id=user.id)
+			recommended_users.append(user.username)
+			
+	return redirect('createTask', pk)
 
 def taskcompleted(request, pk, p_id):
 	try:

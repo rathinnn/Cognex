@@ -12,40 +12,9 @@
 </div>
 {% endfor %}
 
-{% if notrecommended %}
 <div class="container">
 
-
-    <div class="alert alert-info">
-        No Matching users found<br>
-        <hr>
-    </div>
-
-
-</div>
-{% endif %}
-
-{% if recommendations %}
-<div class="container">
-
-
-    <p class="form-control btn btn-primary">
-        Recommended Users:-
-    </p>
-    {% for username in recommendations %}
-    <div class="alert alert-info">
-        Username:- {{username}}<br>
-        <hr>
-    </div>
-    {% endfor %}
-
-
-</div>
-{% endif %}
-
-<div class="container">
-
-    <form method="POST" action="">
+    <form method="POST" action="{% url 'getrecommendation' pk=project.id%}">
         {% csrf_token %}
         Want Recommendations for Users?<br>
         <p class="form-control btn btn-primary">
@@ -54,7 +23,7 @@
         <div class="form-group">
             <select name='skill' class="form-select">
                 {% for choice in choices %}
-                <option value={{choice.1}}>{{choice.1}}</option>
+                <option  value={{choice.1}}>{{choice.1}}</option>
                 {% endfor %}
             </select>
         </div>

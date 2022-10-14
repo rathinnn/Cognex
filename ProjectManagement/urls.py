@@ -30,6 +30,7 @@ urlpatterns = [
     path('Project/<pk>/', userviews.ProjectDetailView.as_view(), name = "projectview"),
     path('Project/<int:p_id>/Task/<int:pk>', userviews.taskcompleted, name='taskcompleted'),
     path('Project/User/complete/<int:pk>', userviews.projectcompleted, name='projectcompleted'),
+    path('getrecommendation/<int:pk>', userviews.getrecommendations, name = 'getrecommendation'),
     path('accept/<int:pk>', userviews.acceptTask, name='accept'),
     path('reject/<int:pk>', userviews.rejectTask, name='reject')
 ]

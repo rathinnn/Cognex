@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+message FindRequest {
+    string skill = 1;
+    int32 max_results = 2;
+}
+
+message UserRecommendation {
+    int32 id = 1;
+}
+
+message RecommendationResponse {
+    repeated UserRecommendation recommendations = 1;
+}
+
+service Recommendations {
+    rpc Recommend (FindRequest) returns (RecommendationResponse);
+}
+
+message PutRequest {
+    int32 id = 1;
+    repeated string skills = 2;
+}
+
+message PutResponse {
+    int32 status = 1;
+}
+
+
+service PutService {
+    rpc Put (PutRequest) returns (PutResponse);
+}
